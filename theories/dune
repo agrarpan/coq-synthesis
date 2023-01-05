@@ -1,0 +1,4 @@
+(coq.theory
+ (name SynthesisPlugin)
+ (package synthesis-coq-plugin)
+ (plugins synthesis-coq-plugin.plugin))

@@ -1,0 +1,9 @@
+(library
+ (name synthesis_plugin)
+ (public_name synthesis-coq-plugin.plugin)
+ (synopsis "My Coq Synthesis Plugin")
+ (flags :standard -rectypes -w -27)
+ (libraries coq-core.vernac))
+
+(coq.pp
+ (modules syntax))

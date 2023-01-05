@@ -1,0 +1,1 @@
+Declare ML Module "synthesis_plugin:synthesis-coq-plugin.plugin".
