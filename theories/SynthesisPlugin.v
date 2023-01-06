@@ -1,1 +1,1 @@
-Declare ML Module "synthesis_plugin:synthesis-coq-plugin.plugin".
+Declare ML Module "synthesis-coq-plugin.plugin".

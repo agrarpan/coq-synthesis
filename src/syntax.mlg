@@ -1,6 +1,11 @@
 DECLARE PLUGIN "synthesis-coq-plugin.plugin"
 
-VERNAC COMMAND EXTEND CallToC CLASSIFIED AS QUERY
-| [ "Hello" ] -> {Feedback.msg_notice Pp.(str Hello_world.hello_world) }
-END
+{
 
+open Ltac_plugin
+
+}
+
+TACTIC EXTEND Hello
+| [ "hello" ] -> { Hello_world.printHello }
+END
