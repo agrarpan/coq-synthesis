@@ -1,0 +1,54 @@
+(* DECLARE PLUGIN "synthesis-coq-plugin.plugin"
+
+{
+
+open Pp
+open Ltac_plugin
+open Stdarg
+
+
+
+let tuto_warn = CWarnings.create ~name:"name" ~category:"category"
+(fun _ -> strbrk Hello_world.message)
+
+}
+
+VERNAC COMMAND EXTEND HelloWorld CLASSIFIED AS QUERY
+| [ "HelloWorld" ] -> { Feedback.msg_notice (strbrk Hello_world.message) }
+END
+
+TACTIC EXTEND hello_world_tactic
+| [ "hello_world" ] ->
+  { let _ = Feedback.msg_notice (str Hello_world.message) in
+    Tacticals.tclIDTAC }
+END
+
+VERNAC COMMAND EXTEND HelloWarning CLASSIFIED AS QUERY
+| [ "HelloWarning" ] ->
+   {
+     tuto_warn ()
+   }
+END
+
+TACTIC EXTEND hello_warning_tactic
+| [ "hello_warning" ] ->
+   {
+     let _ = tuto_warn () in
+     Tacticals.tclIDTAC
+   }
+END
+
+VERNAC COMMAND EXTEND HelloError CLASSIFIED AS QUERY
+| [ "HelloError" ] -> { CErrors.user_err (str Hello_world.message) }
+END
+
+
+TACTIC EXTEND hello_error_tactic
+| [ "hello_error" ] ->
+  { let _ = CErrors.user_err (str Hello_world.message) in
+    Tacticals.tclIDTAC }
+END
+
+TACTIC EXTEND Hello
+| [ "hello" ] -> { Hello_world.printHello }
+END *)

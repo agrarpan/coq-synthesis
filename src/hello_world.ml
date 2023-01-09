@@ -6,6 +6,8 @@ let msg_in_tactic str : unit PV.tactic =
   PV.tclLIFT (PV.NonLogical.make (fun () ->
       Feedback.msg_warning (Pp.str str)))
 
+let message = "Hello world!"
+
 let printHello : unit PV.tactic =
   Py.initialize ();
   let open PV.Notations in
