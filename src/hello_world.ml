@@ -1,7 +1,3 @@
-(** Example: calling a C function *)
-external get_n : unit -> int = "get_n"
-
-let callC () : int = get_n ()
 
 (** Example: simple, no-op tactic + print *)
 module PV = Proofview

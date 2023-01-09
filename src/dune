@@ -4,8 +4,6 @@
  (synopsis "My Coq Synthesis Plugin")
  (flags :standard -rectypes -w -27)
  (libraries pyml coq-core.vernac coq-core.plugins.ltac)
- (foreign_stubs
-  (language c)
-  (names ce_get)))
+)
 (coq.pp
  (modules syntax))
