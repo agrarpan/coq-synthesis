@@ -156,3 +156,12 @@ VERNAC COMMAND EXTEND NameProof CLASSIFIED AS QUERY
   { fun ~pstate ->
     Feedback.msg_notice (strbrk (Names.Id.to_string (Declare.Proof.get_name pstate)))}
 END
+
+VERNAC COMMAND EXTEND Count CLASSIFIED AS SIDEFF
+| [ "Count" ] ->
+   {
+     Counter.increment ();
+     let v = Counter.value () in
+     Feedback.msg_notice (Pp.str "Times Count has been called: " ++ Pp.int v)
+   }
+END
