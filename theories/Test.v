@@ -1,6 +1,6 @@
 Require Import SynthesisPlugin.
 
-Definition definition := 5.
+(* Definition definition := 5.
 What's definition.
 What kind of term is definition.
 What kind of identifier is definition.
@@ -60,7 +60,7 @@ Convertible 1 ((fun (x : nat) => x) 1).
 Convertible 1 2.
 Convertible (fun (x : Type) => x) (fun (x : Prop) => x).
 Convertible Type Prop.
-Convertible 1 ((fun (x : nat) => x) 2).
+Convertible 1 ((fun (x : nat) => x) 2). *)
 
 
 Fail ExploreProof.
@@ -80,6 +80,9 @@ Proof.
     NameProof.
 Abort.
 
+(* Count.
 Count.
 Count.
-Count.
+
+TypeConstr.
+TypeConstr2. *)
