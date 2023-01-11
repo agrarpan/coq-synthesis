@@ -30,3 +30,11 @@ VERNAC COMMAND EXTEND NameProof CLASSIFIED AS QUERY
     Feedback.msg_notice (str (Names.Id.to_string (Declare.Proof.get_name pstate)))}
 END
 
+
+(* VERNAC COMMAND EXTEND TryThis CLASSIFIED AS QUERY
+| ![proof_query] ["TryThis"] ->
+  { fun ~pstate ->
+    let sigma, env = Proof.get_proof_context (Declare.Proof.get pstate) in
+    Feedback.msg_notice (str "Hi")
+    }
+END *)
