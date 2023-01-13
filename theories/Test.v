@@ -1,6 +1,6 @@
 Require Import SynthesisPlugin.
 
-(* Fail ExploreProof.
+Fail ExploreProof.
 
 Theorem bar:
   forall (T : Set) (t : T), T.
@@ -8,7 +8,7 @@ Proof.
   ExploreProof. my_intro T. ExploreProof. my_intro t. ExploreProof. apply t.
 Qed.
 
-Fail NameProof. *)
+Fail NameProof.
 
 Fail TryThis.
 
@@ -18,7 +18,6 @@ Proof.
     (* NameProof. my_intro T. *)
     NameProof.
 Abort.
-
 
 Theorem fiff: (2 + 2 = 5) <-> (2 + 2 = 3).
 Proof.
@@ -33,5 +32,4 @@ Proof.
   PrintGoals.
   intros.
   split.
-  PrintGoals.
 Abort.

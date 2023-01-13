@@ -40,12 +40,12 @@ VERNAC COMMAND EXTEND TryThis CLASSIFIED AS QUERY
   }
 END
 
-VERNAC COMMAND EXTEND TryThis CLASSIFIED AS QUERY
+VERNAC COMMAND EXTEND PrintGoals CLASSIFIED AS QUERY
 | ![proof_query] [ "PrintGoals" ] ->
   {
     fun ~pstate ->
       let proof_t = Declare.Proof.get pstate in
-      let goals = Evar.Set.elements (Proof.all_goals proof_t) in
-      Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl Evar.print goals)
+      let goals = Printer.pr_open_subgoals proof_t in
+      Feedback.msg_notice goals
   }
 END
