@@ -31,10 +31,21 @@ VERNAC COMMAND EXTEND NameProof CLASSIFIED AS QUERY
 END
 
 
-(* VERNAC COMMAND EXTEND TryThis CLASSIFIED AS QUERY
-| ![proof_query] ["TryThis"] ->
-  { fun ~pstate ->
-    let sigma, env = Proof.get_proof_context (Declare.Proof.get pstate) in
-    Feedback.msg_notice (str "Hi")
-    }
-END *)
+VERNAC COMMAND EXTEND TryThis CLASSIFIED AS QUERY
+| ![proof_query] [ "TryThis" ] ->
+  {
+    fun ~pstate ->
+      let proof_data = Proof.data (Declare.Proof.get pstate) in
+      Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl Evar.print proof_data.goals)
+  }
+END
+
+VERNAC COMMAND EXTEND TryThis CLASSIFIED AS QUERY
+| ![proof_query] [ "PrintGoals" ] ->
+  {
+    fun ~pstate ->
+      let proof_t = Declare.Proof.get pstate in
+      let goals = Evar.Set.elements (Proof.all_goals proof_t) in
+      Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl Evar.print goals)
+  }
+END
