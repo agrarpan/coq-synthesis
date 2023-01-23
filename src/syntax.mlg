@@ -2,9 +2,12 @@ DECLARE PLUGIN "synthesis-coq-plugin.plugin"
 
 {
 
-open Pp
+(* open Array *)
 open Ltac_plugin
+open Pp
 open Stdarg
+(* open Sys *)
+(* open Unix *)
 
 }
 
@@ -44,8 +47,11 @@ VERNAC COMMAND EXTEND PrintGoals CLASSIFIED AS QUERY
 | ![proof_query] [ "PrintGoals" ] ->
   {
     fun ~pstate ->
-      let proof_t = Declare.Proof.get pstate in
-      let goals = Printer.pr_open_subgoals proof_t in
-      Feedback.msg_notice goals
+        let proverbot_dir = "/home/arpan/Downloads/proverbot9001/" in
+        let cmd_length = Array.length (Sys.argv) in
+        let filename = Unix.realpath (Sys.argv.(cmd_length - 1)) in
+        let cmd_to_run = proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ filename ^ " --no-generate-report" in
+        let _ = Unix.system (cmd_to_run) in
+        Feedback.msg_notice (str ("Ran the following command:     " ^ cmd_to_run)) 
   }
 END
