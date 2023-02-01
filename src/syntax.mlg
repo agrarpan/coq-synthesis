@@ -47,16 +47,16 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
 | ![proof_query] [ "RunProverbot" ] ->
   {
     fun ~pstate ->
+      let proof_name = Names.Id.to_string (Declare.Proof.get_name pstate) in
         let proverbot_dir = "/home/arpan/Downloads/holder/proverbot9001/" in
         let cmd_length = Array.length (Sys.argv) in
         let filename = Unix.realpath (Sys.argv.(cmd_length - 1)) in
         let ic = Arg.read_arg filename in
         let ic_mod = Array.of_list (List.tl (Array.to_list ic)) in
         let _ = Arg.write_arg "trial.v" ic_mod in
-        let cmd_to_run = proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "~/Downloads/coq-synthesis/_build/default/trial.v" ^ " --no-generate-report" in
-        let ret_code = Unix.system (cmd_to_run) in
-        match ret_code with
-        | WEXITED _ -> Feedback.msg_notice (str "Proverbot ran as expected!")
-        | _ -> Feedback.msg_notice (str "Some error occured in running Proverbot!") 
+        let cmd_to_run = proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "~/Downloads/coq-synthesis/_build/default/trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report" in
+        let _ = Unix.system (cmd_to_run) in
+        let ic' = Core.In_channel.read_all "/home/arpan/Downloads/coq-synthesis/_build/default/search-report/trial-proofs.txt" in
+        Feedback.msg_notice (str ic')
   }
 END

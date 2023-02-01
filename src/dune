@@ -3,7 +3,7 @@
  (public_name synthesis-coq-plugin.plugin)
  (synopsis "My Coq Synthesis Plugin")
  (flags :standard -rectypes -w -27)
- (libraries pyml coq-core.vernac coq-core.plugins.ltac)
+ (libraries pyml core coq-core.vernac coq-core.plugins.ltac)
 )
 (coq.pp
  (modules syntax))

@@ -1,4 +1,4 @@
 (coq.theory
  (name SynthesisPlugin)
  (package synthesis-coq-plugin)
- (libraries pyml synthesis-coq-plugin.plugin))
+ (libraries pyml core synthesis-coq-plugin.plugin))
