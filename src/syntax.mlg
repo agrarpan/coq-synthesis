@@ -55,17 +55,22 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
         let ic_mod = Array.of_list (List.tl (Array.to_list ic)) in
         let _ = Arg.write_arg "trial.v" ic_mod in
         let cmd_to_run = proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "~/Downloads/coq-synthesis/_build/default/trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report 2>/dev/null" in
-        let _ = Unix.system (cmd_to_run) in
-        let strsearch = Str.regexp "status" in
-        let ic' = Core.In_channel.read_all "/home/arpan/Downloads/coq-synthesis/_build/default/search-report/trial-proofs.txt" in
-        let filelen = String.length ic' in
-        let index = (Str.search_forward strsearch ic' 0) - 2 in
-        let relstring = String.sub ic' index (filelen - index - 2) in
-        let json = Yojson.Safe.from_string relstring in
-        let open Yojson.Safe.Util in
-        let commands = json |> member "commands" |> to_list in
-        let tactics = List.map(fun command -> member "tactic" command |> to_string) commands in
-        let _ = Feedback.msg_notice (str "Here's the synthesized proof: ") in
-        Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics)
+        let ret_code = Unix.system (cmd_to_run) in
+        match ret_code with
+        | WEXITED _ -> 
+                       let _ = Feedback.msg_notice (str "Proverbot ran successfully!") in
+                       let strsearch = Str.regexp "status" in
+                       let ic' = Core.In_channel.read_all "/home/arpan/Downloads/coq-synthesis/_build/default/search-report/trial-proofs.txt" in
+                       let filelen = String.length ic' in
+                       let index = (Str.search_forward strsearch ic' 0) - 2 in
+                       let relstring = String.sub ic' index (filelen - index - 2) in
+                       let json = Yojson.Safe.from_string relstring in
+                       let open Yojson.Safe.Util in
+                       let commands = json |> member "commands" |> to_list in
+                       let tactics = List.map(fun command -> member "tactic" command |> to_string) commands in
+                       let _ = Feedback.msg_notice (str "Here's the synthesized proof: ") in
+                       let _ = Feedback.msg_notice (Pp.fnl ()) in
+                       Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics)
+        | _ -> Feedback.msg_notice (str "Something went wrong trying to run Proverbot!")
   }
 END
