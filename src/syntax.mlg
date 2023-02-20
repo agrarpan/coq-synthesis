@@ -31,6 +31,24 @@ VERNAC COMMAND EXTEND NameProof CLASSIFIED AS QUERY
 END
 
 
+VERNAC COMMAND EXTEND FileName CLASSIFIED AS QUERY
+| [ "FileName" ] ->
+{
+  let cur_mp = Names.ModPath.to_string (Lib.current_mp ()) in
+  Feedback.msg_notice (str cur_mp)
+}
+END
+
+
+VERNAC COMMAND EXTEND AllArgs CLASSIFIED AS QUERY
+| [ "AllArgs" ] ->
+{
+  let argarray = Sys.argv in
+  Feedback.msg_notice (Pp.prvect_with_sep Pp.fnl str argarray)
+}
+END
+
+
 VERNAC COMMAND EXTEND TryThis CLASSIFIED AS QUERY
 | ![proof_query] [ "TryThis" ] ->
   {
@@ -72,8 +90,8 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
   }
 END
 
-VERNAC COMMAND EXTEND CHECKTYPEOF CLASSIFIED AS QUERY
-| [ "CheckTypeOf" constr(e) ] ->
+VERNAC COMMAND EXTEND Decompile CLASSIFIED AS QUERY
+| [ "Decompile" constr(e) ] ->
   {
     let env = Global.env () in
     let sigma = Evd.from_env env in
