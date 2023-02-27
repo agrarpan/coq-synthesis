@@ -9,6 +9,40 @@ open Stdarg
 }
 
 
+VERNAC COMMAND EXTEND PrintGoals CLASSIFIED AS QUERY
+| ![proof_query] [ "PrintGoals" ] ->
+  {
+    fun ~pstate ->
+      let proof_t = Declare.Proof.get pstate in
+      let goal_str = Pp.string_of_ppcmds (Printer.pr_open_subgoals proof_t) in
+      let goal_len = String.length goal_str in
+      let strsearch = String.sub goal_str 6 (goal_len - 6) in
+      let strlist = Str.split (Str.regexp "============================") strsearch in
+      (* let goal = List.nth strlist 1 in *)
+      let hypotheses_list = List.nth strlist 0 in
+      Feedback.msg_notice (str hypotheses_list)
+  }
+END
+
+VERNAC COMMAND EXTEND ShowGoals CLASSIFIED AS QUERY
+| ![proof_query] ["ShowGoals"] ->
+  {
+    fun ~pstate -> 
+      let proof_t = Declare.Proof.get pstate in
+      let Proof.{goals; stack; sigma; entry; _} = Proof.data proof_t in
+      begin match goals with
+      | [] -> Feedback.msg_notice (str "No open goals.")
+      | _ -> 
+        let bgoals = Proof.background_subgoals proof_t in
+        let bgoals_focused, bgoals_unfocused = List.partition (fun x -> List.mem x goals) bgoals in
+        let env, concl = Evd.evar_filtered_env (Global.env ()) (Evd.find sigma (List.hd bgoals_focused)), Evd.evar_concl (Evd.find sigma (List.hd bgoals_focused))
+        in 
+        let _ = Feedback.msg_notice (Printer.pr_context_of env sigma) in
+        Feedback.msg_notice (Printer.pr_letype_env ~goal_concl_style:true env sigma concl)
+      end
+  }
+END
+
 TACTIC EXTEND my_intro
 | [ "my_intro" ident(i) ] ->
   { Tactics.introduction i }
