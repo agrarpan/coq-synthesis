@@ -28,6 +28,7 @@ VERNAC COMMAND EXTEND ShowGoals CLASSIFIED AS QUERY
 | ![proof_query] ["ShowGoals"] ->
   {
     fun ~pstate -> 
+      let proverbot_dir = "/home/arpan/Downloads/proverbot9001-plugin/" in
       let proof_t = Declare.Proof.get pstate in
       let Proof.{goals; stack; sigma; entry; _} = Proof.data proof_t in
       begin match goals with
@@ -37,8 +38,12 @@ VERNAC COMMAND EXTEND ShowGoals CLASSIFIED AS QUERY
         let bgoals_focused, bgoals_unfocused = List.partition (fun x -> List.mem x goals) bgoals in
         let env, concl = Evd.evar_filtered_env (Global.env ()) (Evd.find sigma (List.hd bgoals_focused)), Evd.evar_concl (Evd.find sigma (List.hd bgoals_focused))
         in 
-        let _ = Feedback.msg_notice (Printer.pr_context_of env sigma) in
-        Feedback.msg_notice (Printer.pr_letype_env ~goal_concl_style:true env sigma concl)
+        let hyp_list = Pp.string_of_ppcmds (Printer.pr_context_of env sigma) in
+        let goal = Pp.string_of_ppcmds (Printer.pr_letype_env ~goal_concl_style:true env sigma concl) in
+        let split_hyp_list = Str.split (Str.regexp "\n") hyp_list in
+        let hyp_string = List.fold_left (fun a b -> a ^ "\"" ^ b ^ "\"" ^ " ") "" split_hyp_list in
+        let cmd_to_run = "python " ^ proverbot_dir ^ "src/plugin_predictor.py data/polyarg-weights.dat" ^ " --rel_lemmas \" \"" ^ " --prev_tactics \" \"" ^ " --hypotheses " ^ hyp_string ^ " --goal " ^ "\"" ^ goal ^ "\"" in
+        Feedback.msg_notice (str cmd_to_run)  
       end
   }
 END
