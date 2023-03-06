@@ -6,8 +6,30 @@ open Ltac_plugin
 open Pp
 open Stdarg
 
+
+
+
+let proverbot_dir_global = ref "~/Downloads/proverbot9001-plugin/"
+
+let _ = Goptions.declare_string_option {
+  optdepr=false;
+  (* optname="Proverbot Path"; *)
+  optkey=["Proverbot";"Path"];
+  optread=(fun () -> !proverbot_dir_global);
+  optwrite=(fun s -> proverbot_dir_global := s)
 }
 
+let current_file_path = ref "/home/arpan/Downloads/coq-synthesis/theories/Test.v"
+
+let _ = Goptions.declare_string_option {
+  optdepr=false;
+  (* optname="Current File Path"; *)
+  optkey=["Current";"File";"Path"];
+  optread=(fun () -> !current_file_path);
+  optwrite=(fun s -> current_file_path := s)
+}
+
+}
 
 VERNAC COMMAND EXTEND PrintGoals CLASSIFIED AS QUERY
 | ![proof_query] [ "PrintGoals" ] ->
@@ -28,7 +50,7 @@ VERNAC COMMAND EXTEND PredictTactic CLASSIFIED AS QUERY
 | ![proof_query] ["PredictTactic"] ->
   {
     fun ~pstate -> 
-      let proverbot_dir = "/home/arpan/Downloads/proverbot9001-plugin/" in
+      let proverbot_dir = !proverbot_dir_global in
       let proof_t = Declare.Proof.get pstate in
       let Proof.{goals; stack; sigma; entry; _} = Proof.data proof_t in
       begin match goals with
@@ -42,7 +64,7 @@ VERNAC COMMAND EXTEND PredictTactic CLASSIFIED AS QUERY
         let goal = Pp.string_of_ppcmds (Printer.pr_letype_env ~goal_concl_style:true env sigma concl) in
         let split_hyp_list = Str.split (Str.regexp "\n") hyp_list in
         let hyp_string = List.fold_left (fun a b -> a ^ "\"" ^ b ^ "\"" ^ " ") "" split_hyp_list in
-        let cmd_to_run = "python " ^ proverbot_dir ^ "src/plugin_predictor.py " ^ proverbot_dir ^ "data/polyarg-weights.dat" ^ " --rel_lemmas \" \"" ^ " --prev_tactics \" \"" ^ " --hypotheses " ^ hyp_string ^ " --goal " ^ "\"" ^ goal ^ "\"" in
+        let cmd_to_run = "python " ^ proverbot_dir ^ "src/plugin_predictor.py " ^ proverbot_dir ^ "data/polyarg-weights.dat" ^ " --rel_lemmas \" \"" ^ " --prev_tactics \"Proof.\"" ^ " --hypotheses " ^ hyp_string ^ " --goal " ^ "\"" ^ goal ^ "\"" in
         let ret_code = Unix.system (cmd_to_run) in
         match ret_code with
         | WEXITED _ -> Feedback.msg_notice (Pp.fnl ())
@@ -54,6 +76,11 @@ END
 TACTIC EXTEND my_intro
 | [ "my_intro" ident(i) ] ->
   { Tactics.introduction i }
+END
+
+VERNAC COMMAND EXTEND StringInput CLASSIFIED AS QUERY
+| [ "StringInput" ident(i) ] ->
+  { Feedback.msg_notice (str (Names.Id.to_string i)) }
 END
 
 VERNAC COMMAND EXTEND ExploreProof CLASSIFIED AS QUERY
@@ -105,9 +132,9 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
   {
     fun ~pstate ->
       let proof_name = Names.Id.to_string (Declare.Proof.get_name pstate) in
-        let proverbot_dir = "/home/arpan/Downloads/holder/proverbot9001/" in
-        let cmd_length = Array.length (Sys.argv) in
-        let filename = Unix.realpath (Sys.argv.(cmd_length - 1)) in
+        let proverbot_dir = !proverbot_dir_global in
+        (* let cmd_length = Array.length (Sys.argv) in *)
+        let filename = !current_file_path in
         let ic = Arg.read_arg filename in
         let ic_mod = Array.of_list (List.tl (Array.to_list ic)) in
         let _ = Arg.write_arg "trial.v" ic_mod in
