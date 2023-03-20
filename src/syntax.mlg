@@ -19,7 +19,7 @@ let _ = Goptions.declare_string_option {
   optwrite=(fun s -> proverbot_dir_global := s)
 }
 
-let current_file_path = ref "/home/arpan/Downloads/coq-synthesis/theories/Test.v"
+let current_file_path = ref "~/Downloads/coq-synthesis/theories/Test.v"
 
 let _ = Goptions.declare_string_option {
   optdepr=false;
@@ -133,18 +133,17 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
     fun ~pstate ->
       let proof_name = Names.Id.to_string (Declare.Proof.get_name pstate) in
         let proverbot_dir = !proverbot_dir_global in
-        (* let cmd_length = Array.length (Sys.argv) in *)
         let filename = !current_file_path in
         let ic = Arg.read_arg filename in
         let ic_mod = Array.of_list (List.tl (Array.to_list ic)) in
         let _ = Arg.write_arg "trial.v" ic_mod in
-        let cmd_to_run = proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "~/Downloads/coq-synthesis/_build/default/trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report 2>/dev/null" in
+        let cmd_to_run = proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report 2>/dev/null" in
         let ret_code = Unix.system (cmd_to_run) in
         match ret_code with
         | WEXITED _ -> 
                        let _ = Feedback.msg_notice (str "Proverbot ran successfully!") in
                        let strsearch = Str.regexp "status" in
-                       let ic' = Core.In_channel.read_all "/home/arpan/Downloads/coq-synthesis/_build/default/search-report/trial-proofs.txt" in
+                       let ic' = Core.In_channel.read_all "search-report/trial-proofs.txt" in
                        let filelen = String.length ic' in
                        let index = (Str.search_forward strsearch ic' 0) - 2 in
                        let relstring = String.sub ic' index (filelen - index - 2) in
