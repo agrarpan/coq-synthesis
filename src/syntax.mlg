@@ -31,21 +31,6 @@ let _ = Goptions.declare_string_option {
 
 }
 
-VERNAC COMMAND EXTEND PrintGoals CLASSIFIED AS QUERY
-| ![proof_query] [ "PrintGoals" ] ->
-  {
-    fun ~pstate ->
-      let proof_t = Declare.Proof.get pstate in
-      let goal_str = Pp.string_of_ppcmds (Printer.pr_open_subgoals proof_t) in
-      let goal_len = String.length goal_str in
-      let strsearch = String.sub goal_str 6 (goal_len - 6) in
-      let strlist = Str.split (Str.regexp "============================") strsearch in
-      (* let goal = List.nth strlist 1 in *)
-      let hypotheses_list = List.nth strlist 0 in
-      Feedback.msg_notice (str hypotheses_list)
-  }
-END
-
 VERNAC COMMAND EXTEND PredictTactic CLASSIFIED AS QUERY
 | ![proof_query] ["PredictTactic"] ->
   {
@@ -73,60 +58,6 @@ VERNAC COMMAND EXTEND PredictTactic CLASSIFIED AS QUERY
   }
 END
 
-TACTIC EXTEND my_intro
-| [ "my_intro" ident(i) ] ->
-  { Tactics.introduction i }
-END
-
-VERNAC COMMAND EXTEND StringInput CLASSIFIED AS QUERY
-| [ "StringInput" ident(i) ] ->
-  { Feedback.msg_notice (str (Names.Id.to_string i)) }
-END
-
-VERNAC COMMAND EXTEND ExploreProof CLASSIFIED AS QUERY
-| ![ proof_query ] [ "ExploreProof" ] ->
-  { fun ~pstate ->
-    let sigma, env = Declare.Proof.get_current_context pstate in
-    let pprf = Proof.partial_proof (Declare.Proof.get pstate) in
-    Feedback.msg_notice
-      (Pp.prlist_with_sep Pp.fnl (Printer.pr_econstr_env env sigma) pprf)
-  }
-END
-
-VERNAC COMMAND EXTEND NameProof CLASSIFIED AS QUERY
-| ![proof_query] [ "NameProof" ] ->
-  { fun ~pstate ->
-    Feedback.msg_notice (str (Names.Id.to_string (Declare.Proof.get_name pstate)))}
-END
-
-
-VERNAC COMMAND EXTEND FileName CLASSIFIED AS QUERY
-| [ "FileName" ] ->
-{
-  let cur_mp = Names.ModPath.to_string (Lib.current_mp ()) in
-  Feedback.msg_notice (str cur_mp)
-}
-END
-
-
-VERNAC COMMAND EXTEND AllArgs CLASSIFIED AS QUERY
-| [ "AllArgs" ] ->
-{
-  let argarray = Sys.argv in
-  Feedback.msg_notice (Pp.prvect_with_sep Pp.fnl str argarray)
-}
-END
-
-
-VERNAC COMMAND EXTEND TryThis CLASSIFIED AS QUERY
-| ![proof_query] [ "TryThis" ] ->
-  {
-    fun ~pstate ->
-      let proof_data = Proof.data (Declare.Proof.get pstate) in
-      Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl Evar.print proof_data.goals)
-  }
-END
-
 VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
 | ![proof_query] [ "RunProverbot" ] ->
   {
@@ -151,9 +82,11 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
                        let open Yojson.Safe.Util in
                        let commands = json |> member "commands" |> to_list in
                        let tactics = List.map(fun command -> member "tactic" command |> to_string) commands in
+                       let _ = Unix.system ("rm -r trial.v search-report/*") in
                        let _ = Feedback.msg_notice (str "Here's the synthesized proof: ") in
                        let _ = Feedback.msg_notice (Pp.fnl ()) in
                        Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics)
+                       
         | _ -> Feedback.msg_notice (str "Something went wrong trying to run Proverbot!")
   }
 END
