@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -euv
 
 read_in () {
   while :
