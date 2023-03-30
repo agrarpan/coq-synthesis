@@ -31,6 +31,11 @@ let _ = Goptions.declare_string_option {
 
 }
 
+TACTIC EXTEND my_intro
+| [ "my_intro" ident(i) ] ->
+  { Tactics.introduction i }
+END
+
 VERNAC COMMAND EXTEND PredictTactic CLASSIFIED AS QUERY
 | ![proof_query] ["PredictTactic"] ->
   {
