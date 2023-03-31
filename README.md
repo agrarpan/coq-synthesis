@@ -35,13 +35,15 @@ few times.
 
 Once that's finished, you're ready to start running the tool!
 
-To try the tool, open a `.v` file, and write this on line 1 of the file:
+To try the tool, open a `.v` file, (to import the plugin correctly, run `dune coq top --toplevel coqide path/to/.v/file`) and write this on line 1 of the file:
 
 `Require Import SynthesisPlugin.`
 
 You will also have to provide the path to proverbot:
 
-`Set Proverbot Path path/to/proverbot`
+`Set Proverbot Path path/to/proverbot`,
+
+which the setup script clones one level above the current directory
 
 and the current file path:
 
