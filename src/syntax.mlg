@@ -19,7 +19,7 @@ let _ = Goptions.declare_string_option {
   optwrite=(fun s -> proverbot_dir_global := s)
 }
 
-let current_file_path = ref "~/Downloads/coq-synthesis/theories/Test.v"
+let current_file_path = ref "/home/arpan/Downloads/coq-synthesis/theories/Test.v"
 
 let _ = Goptions.declare_string_option {
   optdepr=false;
@@ -73,7 +73,8 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
         let ic = Arg.read_arg filename in
         let ic_mod = Array.of_list (List.tl (Array.to_list ic)) in
         let _ = Arg.write_arg "trial.v" ic_mod in
-        let cmd_to_run = proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report 2>/dev/null" in
+        let theorem_lemma = Array.sub ic_mod 0 (Array.length ic_mod - 3) in
+        let cmd_to_run = proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report" in
         let ret_code = Unix.system (cmd_to_run) in
         match ret_code with
         | WEXITED _ -> 
@@ -90,7 +91,11 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
                        let _ = Unix.system ("rm -r trial.v search-report/*") in
                        let _ = Feedback.msg_notice (str "Here's the synthesized proof: ") in
                        let _ = Feedback.msg_notice (Pp.fnl ()) in
-                       Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics)
+                       let _ = Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics) in
+                       let _ = Arg.write_arg "proved_theorem.v" (Array.append theorem_lemma (Array.of_list tactics)) in
+                       let _ = Unix.system ("alectryon --frontend coq --backend webpage proved_theorem.v -o proved_theorem.html") in
+                       let _ = Unix.system ("python " ^ proverbot_dir ^ "src/create_webpage.py") in
+                       Feedback.msg_notice (str "Done.")
                        
         | _ -> Feedback.msg_notice (str "Something went wrong trying to run Proverbot!")
   }
