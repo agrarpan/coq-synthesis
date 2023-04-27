@@ -20,9 +20,10 @@ read_in () {
 echo "We will begin by setting up a new opam switch and a new conda env. Continue? [y/n]"
 
 if read_in; then
-    opam switch create synth coq=8.16.1
-    conda create --name synth python=3.10.0
+    opam switch create synth 4.13.1
     eval $(opam env)
+    opam pin add coq 8.16.1
+    conda create --name synth python=3.10.0
     conda activate synth
 else
     echo "Exiting setup."
