@@ -24,6 +24,7 @@ if read_in; then
     eval $(opam env)
     opam pin add coq 8.16.1
     conda create --name synth python=3.10.0
+    source ~/anaconda3/etc/profile.d/conda.sh
     conda activate synth
 else
     echo "Exiting setup."

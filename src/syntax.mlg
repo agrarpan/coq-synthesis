@@ -95,7 +95,7 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
                        let _ = Arg.write_arg "proved_theorem.v" (Array.append theorem_lemma (Array.of_list tactics)) in
                        let _ = Unix.system ("alectryon --frontend coq --backend webpage proved_theorem.v -o proved_theorem.html") in
                        let _ = Unix.system ("python " ^ proverbot_dir ^ "src/create_webpage.py") in
-                       Feedback.msg_notice (str "Done.")
+                       Feedback.msg_notice (Pp.fnl ())
                        
         | _ -> Feedback.msg_notice (str "Something went wrong trying to run Proverbot!")
   }
