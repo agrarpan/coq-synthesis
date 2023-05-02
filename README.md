@@ -4,7 +4,7 @@ Coq plugin for proof generation and next tactic prediction.
 ## Prerequisites
 
 You'll need to install `git`, `opam`, `rustup`, `graphviz`, `libgraphviz-dev`,
-`python3.10`, `python3.10-dev` and `python3.10-pip` to run Proverbot, which is the ML theorem prover that this plugin uses.
+`python3.10`, `python3.10-dev` and `python3.10-pip` to run Proverbot, which is the ML theorem prover that this plugin uses (Proverbot will be installed by the setup script for the plugin).
 
 
 The first thing you'll need to do is clone the repository (download the code).
@@ -33,6 +33,8 @@ make setup
 This step will take a while, and might involve having to type `y` a
 few times.
 
+After the script finishes running, run `dune build` inside the `coq-synthesis directory` (Make sure to change the proverbot and current file paths in `Test.v` according to the instructions below).
+
 Once that's finished, you're ready to start running the tool!
 
 To try the tool, open a `.v` file, (to import the plugin correctly, run `dune coq top --toplevel coqide path/to/.v/file`) and write this on line 1 of the file:
@@ -41,12 +43,13 @@ To try the tool, open a `.v` file, (to import the plugin correctly, run `dune co
 
 You will also have to provide the path to proverbot:
 
-`Set Proverbot Path path/to/proverbot`,
+`Set Proverbot Path path/to/proverbot/`,
 
 which the setup script clones one level above the current directory
 
 and the current file path:
 
-`Set Current File Path path/to/this/.v/file`
+`Set Current File Path path/to/this/.v file`
 
-To generate the proof for a theorem, start the proof with `Proof.`, and in the proof body, call the command `RunProverbot`.
+
+To generate the proof for a theorem, start the proof with `Proof.`, and in the proof body, call the command `RunProverbot` followed by `Admitted`. If Proverbot succeeds in proving the theorem, it will open up a new browser window with the search tree it explored.
