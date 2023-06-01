@@ -8,7 +8,6 @@ open Stdarg
 
 
 
-
 let proverbot_dir_global = ref "~/Downloads/proverbot9001-plugin/"
 
 let _ = Goptions.declare_string_option {
@@ -88,11 +87,53 @@ VERNAC COMMAND EXTEND RunProverbot CLASSIFIED AS QUERY
                        let open Yojson.Safe.Util in
                        let commands = json |> member "commands" |> to_list in
                        let tactics = List.map(fun command -> member "tactic" command |> to_string) commands in
-                       let _ = Unix.system ("rm -r trial.v search-report/*") in
+                       (* let _ = Unix.system ("rm -r trial.v search-report/*") in *)
                        let _ = Feedback.msg_notice (str "Here's the synthesized proof: ") in
                        let _ = Feedback.msg_notice (Pp.fnl ()) in
                        let _ = Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics) in
                        let _ = Arg.write_arg "proved_theorem.v" (Array.append theorem_lemma (Array.of_list tactics)) in
+                       let _ = Unix.system ("alectryon --frontend coq --backend webpage proved_theorem.v -o proved_theorem.html") in
+                       let _ = Unix.system ("python " ^ proverbot_dir ^ "src/create_webpage.py") in
+                       Feedback.msg_notice (Pp.fnl ())
+                       
+        | _ -> Feedback.msg_notice (str "Something went wrong trying to run Proverbot!")
+  }
+END
+
+VERNAC COMMAND EXTEND RunProverbot2 CLASSIFIED AS QUERY
+| ![proof_query] [ "RunProverbot2" ] ->
+  {
+    fun ~pstate ->
+      let proof_name = Names.Id.to_string (Declare.Proof.get_name pstate) in
+        let proverbot_dir = !proverbot_dir_global in
+        let filename = !current_file_path in
+        let ic = Core.In_channel.input_lines (Core.In_channel.create filename) in
+        let ic_mod = List.filter (fun (x) -> not (Core.String.equal (Core.String.strip x) "RunProverbot2.")) (List.map Core.String.strip ic) in
+        let ic_mod_length = Core.List.length ic_mod in
+        let _ = Core.Out_channel.write_lines "trial.v" (List.tl ic_mod) in
+        let (name_index, _) = Option.get (Core.List.findi ic_mod ~f:(fun i x -> Utils.contains x proof_name)) in 
+        let theorem_lemma = Core.List.slice ic_mod 1 (name_index + 1) in
+        let proof_prefix_list = Core.List.slice ic_mod (name_index + 2) (ic_mod_length - 1) in
+        let proof_prefix = String.concat "" proof_prefix_list in
+        let cmd_to_run = if (Core.String.equal "" proof_prefix) then proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report" else proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat" ^ " --search-prefix " ^ "\"" ^ proof_prefix ^ "\"" ^ " trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report" in
+        let ret_code = Unix.system (cmd_to_run) in
+        match ret_code with
+        | WEXITED _ -> 
+                       let _ = Feedback.msg_notice (str "Proverbot ran successfully!") in
+                       let strsearch = Str.regexp "status" in
+                       let ic' = Core.In_channel.read_all "search-report/trial-proofs.txt" in
+                       let filelen = String.length ic' in
+                       let index = (Str.search_forward strsearch ic' 0) - 2 in
+                       let relstring = String.sub ic' index (filelen - index - 2) in
+                       let json = Yojson.Safe.from_string relstring in
+                       let open Yojson.Safe.Util in
+                       let commands = json |> member "commands" |> to_list in
+                       let tactics = List.map(fun command -> member "tactic" command |> to_string) commands in
+                       let _ = Unix.system ("rm -r trial.v search-report/*") in
+                       let _ = Feedback.msg_notice (str "Here's the synthesized proof: ") in
+                       let _ = Feedback.msg_notice (Pp.fnl ()) in
+                       let _ = Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics) in
+                       let _ = Core.Out_channel.write_lines "proved_theorem.v" (Core.List.append theorem_lemma tactics) in
                        let _ = Unix.system ("alectryon --frontend coq --backend webpage proved_theorem.v -o proved_theorem.html") in
                        let _ = Unix.system ("python " ^ proverbot_dir ^ "src/create_webpage.py") in
                        Feedback.msg_notice (Pp.fnl ())

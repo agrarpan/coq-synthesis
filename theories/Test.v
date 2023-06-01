@@ -6,5 +6,6 @@ Set Current File Path "/home/arpan/Downloads/coq-synthesis/theories/Test.v".
 
 Theorem fiff_2 : (2 + 2 = 7) -> False.
 Proof.
-  RunProverbot.
+  intros.
+  RunProverbot2.
 Admitted.
