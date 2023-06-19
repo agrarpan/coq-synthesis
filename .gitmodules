@@ -1,0 +1,6 @@
+[submodule "deps/fix-to-elim"]
+	path = deps/fix-to-elim
+	url = https://github.com/uwplse/fix-to-elim.git
+[submodule "deps/coq-plugin-lib"]
+	path = deps/coq-plugin-lib
+	url = https://github.com/uwplse/coq-plugin-lib.git
