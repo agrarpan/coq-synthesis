@@ -114,12 +114,12 @@ VERNAC COMMAND EXTEND RunProverbot2 CLASSIFIED AS QUERY
         let (name_index, _) = Option.get (Core.List.findi ic_mod ~f:(fun i x -> Utils.contains x proof_name)) in 
         let theorem_lemma = Core.List.slice ic_mod 1 (name_index + 1) in
         let proof_prefix_list = Core.List.slice ic_mod (name_index + 2) (ic_mod_length - 1) in
-        let proof_prefix = String.concat "" proof_prefix_list in
+        let proof_prefix = String.concat " " proof_prefix_list in
         let cmd_to_run = if (Core.String.equal "" proof_prefix) then proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat " ^ "trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report" else proverbot_dir ^ "src/search_file.py --weightsfile " ^ proverbot_dir ^ "data/polyarg-weights.dat" ^ " --search-prefix " ^ "\"" ^ proof_prefix ^ "\"" ^ " trial.v" ^ " --proof=" ^ proof_name ^ " --no-generate-report" in
         let ret_code = Unix.system (cmd_to_run) in
         match ret_code with
         | WEXITED _ -> 
-                       let _ = Feedback.msg_notice (str "Proverbot ran successfully!") in
+                       let _ = Feedback.msg_notice (str "Proverbot ran without errors!") in
                        let strsearch = Str.regexp "status" in
                        let ic' = Core.In_channel.read_all "search-report/trial-proofs.txt" in
                        let filelen = String.length ic' in
