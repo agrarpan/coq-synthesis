@@ -119,7 +119,6 @@ VERNAC COMMAND EXTEND RunProverbot2 CLASSIFIED AS QUERY
         let ret_code = Unix.system (cmd_to_run) in
         match ret_code with
         | WEXITED _ -> 
-                       let _ = Feedback.msg_notice (str "Proverbot ran without errors!") in
                        let strsearch = Str.regexp "status" in
                        let ic' = Core.In_channel.read_all "search-report/trial-proofs.txt" in
                        let filelen = String.length ic' in
@@ -130,9 +129,15 @@ VERNAC COMMAND EXTEND RunProverbot2 CLASSIFIED AS QUERY
                        let commands = json |> member "commands" |> to_list in
                        let tactics = List.map(fun command -> member "tactic" command |> to_string) commands in
                        let _ = Unix.system ("rm -r trial.v search-report/*") in
-                       let _ = Feedback.msg_notice (str "Here's the synthesized proof: ") in
-                       let _ = Feedback.msg_notice (Pp.fnl ()) in
-                       let _ = Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics) in
+                       let _ = 
+                        if (Core.List.length tactics == 2) then
+                           Feedback.msg_notice (str "Proverbot ran without errors but did not successfully generate a proof.") 
+                        else 
+                          ( 
+                          let _ = Feedback.msg_notice (str "Proverbot ran successfully!") in
+                          let _ = Feedback.msg_notice (str "Here's the synthesized proof: ") in
+                          let _ = Feedback.msg_notice (Pp.fnl ()) in
+                          Feedback.msg_notice (Pp.prlist_with_sep Pp.fnl str tactics)) in
                        let _ = Core.Out_channel.write_lines "proved_theorem.v" (Core.List.append theorem_lemma tactics) in
                        let _ = Unix.system ("alectryon --frontend coq --backend webpage proved_theorem.v -o proved_theorem.html") in
                        let _ = Unix.system ("python " ^ proverbot_dir ^ "src/create_webpage.py") in
