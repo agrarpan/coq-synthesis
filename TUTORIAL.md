@@ -39,9 +39,27 @@ After the script finishes running, run `dune build` inside the `coq-synthesis di
 
 Once that's finished, you're ready to start running the tool!
 
-To try the tool, open a `.v` file, (to import the plugin correctly, run `dune coq top --toplevel coqide path/to/.v/file`) and write this on line 1 of the file:
+### Troubleshooting problems during setup
+
+Depending on your OS, sourcing of the conda environment can sometimes fail. You might have to manually load the virtual environment created by the script (called synth).
+
+If you see an error message near the bottom that says:
+```
+pygraphviz/graphviz_wrap.c:2711:10: fatal error: graphviz/cgraph.h: No such file or directory
+ 2711 | #include "graphviz/cgraph.h"
+      |          ^~~~~~~~~~~~~~~~~~~
+compilation terminated.
+error: command 'x86_64-linux-gnu-gcc' failed with exit status 1
+```
+then python needs help finding your graphviz installation. Check out this github issue: https://github.com/pygraphviz/pygraphviz/issues/155, and possibly this one: https://github.com/pypa/setuptools/issues/2740
+
+## Using the plugin.
+
+To try the tool, open a `.v` file, (to import the plugin correctly, run `dune coq top --toplevel coqide path/to/.v/file`) and write this on line 1 of the file (It is necessary for this to be on line 1 because of the way the plugin parses files):
 
 `Require Import SynthesisPlugin.`
+
+(For some reason, this does not open the file in coqide, and I have to manually open the file from the coqide menu. If you know how to fix this, please let us know).
 
 You will also have to provide the path to proverbot:
 
@@ -54,4 +72,11 @@ and the current file path:
 `Set Current File Path path/to/this/.v file`
 
 
-To generate the proof for a theorem, start the proof with `Proof.`, and in the proof body, call the command `RunProverbot` followed by `Admitted`. If Proverbot succeeds in proving the theorem, it will open up a new browser window with the search tree it explored.
+### Commands introduced by this plugin.
+
+This plugin introduces 3 new commands: 
+1) RunProverbot2, which tries to synthesize a proof for you. It has to be called after starting a proof.
+2) Decompile term_name, which takes the name of a term and tries to decompile it. It has to be called after the term has been declared. We're adding more functionality to this currently.
+3) PredictTactic, which predicts the top 5 tactics to be used at the current proof state. It has to be called after starting a proof.
+
+To generate the proof for a theorem, start the proof with `Proof.`, and in the proof body, call the command `RunProverbot2` followed by `Admitted`. If Proverbot succeeds in proving the theorem, it will open up a new browser window with the search tree it explored.
