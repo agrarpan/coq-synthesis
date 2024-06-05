@@ -81,6 +81,9 @@ This plugin introduces 3 new commands:
 
 To generate the proof for a theorem, start the proof with `Proof.`, and in the proof body, call the command `RunProverbot2` followed by `Admitted`. You can optionally provide a partial proof before calling the `RunProverbot2` tactic, which can be used to guide the proof search. If Proverbot succeeds in proving the theorem, it will open up a new browser window with the search tree it explored.
 
+For example, in file theories/Test.v, if we run RunProverbot2 right after starting the proof, Proverbot does not manage to find a proof for the theorem. If we examine the search tree, we can see that it attempted to induct on the lists, but never on the inductive hypothesis itself.
+We can guide the search in the right direction by using `induction 1` on the line before we call `RunProverbot2` (this tactic inducts on the first unnamed hypothesis). Provebot then manages to prove the theorem! 
+
 To decompile a term, you can call `Decompile term_name` at any point after the term has been declared.
 
 To predict the best 5 tactics at any point in a proof, you can call `PredictTactic`.
