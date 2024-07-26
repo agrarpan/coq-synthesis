@@ -38,6 +38,7 @@ if read_in; then
     echo "Starting setup now, this may take a while."
     git clone git@github.com:agrarpan/proverbot9001-plugin.git ../proverbot9001-plugin
     cd ../proverbot9001-plugin
+    git pull
     make setup
     make download-weights
 else
