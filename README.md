@@ -37,6 +37,8 @@ After the script finishes running, run `dune build` inside the `coq-synthesis di
 
 Once that's finished, you're ready to start running the tool!
 
+At this point, you might have to source the conda environment created by the script manually (`conda activate synth`).
+
 To try the tool, open a `.v` file, (to import the plugin correctly, run `dune coq top --toplevel coqide path/to/.v/file`) and write this on line 1 of the file:
 
 `Require Import SynthesisPlugin.`
